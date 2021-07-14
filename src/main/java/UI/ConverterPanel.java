@@ -7,7 +7,8 @@ import model.DBFRow;
 import output_processor.XMLWriter;
 import output_processor.XMLWriterImpl;
 import processor.RowsToXMLProcessor;
-import processor.RowsToXMLProcessorImpl;
+import processor.SixFormRowsToXMLProcessorImpl;
+import row_convertors.DBFtoRowConvertor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,16 +18,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
-public class MainPanel extends JPanel {
+public class ConverterPanel extends JPanel {
 
     private File file;
     private final JLabel chooseFileLabel;
     private final JButton convertButton = new JButton("Конвертировать");
 
-    public MainPanel() {
+    public ConverterPanel(DBFtoRowConvertor dbFtoRowConvertor, RowsToXMLProcessor rowsToXMLProcessor) {
         init();
 
         if (file == null) {
@@ -73,10 +73,9 @@ public class MainPanel extends JPanel {
                         JOptionPane.ERROR_MESSAGE);
             }
 
-            RowsCreator rowsCreator = new RowsCreatorImpl();
+            RowsCreator rowsCreator = new RowsCreatorImpl(dbFtoRowConvertor);
             try {
                 List<DBFRow> rows = rowsCreator.getRowsFromDbfReader(dbfReader);
-                RowsToXMLProcessor rowsToXMLProcessor = new RowsToXMLProcessorImpl();
                 String resultXml = rowsToXMLProcessor.convertRowsToXmlString(rows);
 
                 XMLWriter xmlWriter = new XMLWriterImpl();
@@ -95,6 +94,13 @@ public class MainPanel extends JPanel {
                 JOptionPane.showMessageDialog(
                         this,
                         "Неверное кол-во колонок во входящем файле!",
+                        "Ошибка!",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Неверное имя одной или нескольких колонок во входящем файле!",
                         "Ошибка!",
                         JOptionPane.ERROR_MESSAGE);
             }

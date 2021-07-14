@@ -5,18 +5,13 @@ import lombok.experimental.FieldDefaults;
 import model.DBFRow;
 import model.XMLTag;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class RowsToXMLProcessorImpl implements RowsToXMLProcessor {
+public class SixFormRowsToXMLProcessorImpl extends AbstractRowsToXMLLProcessor {
 
     List<XMLTag> T1RXXXXG5_list = new ArrayList<>();
     List<XMLTag> T1RXXXXG6_list = new ArrayList<>();
@@ -50,7 +45,8 @@ public class RowsToXMLProcessorImpl implements RowsToXMLProcessor {
         return writeTags();
     }
 
-    private String writeTags() {
+    @Override
+    String writeTags() {
         StringWriter stringWriter = new StringWriter();
 
         writeTag("T1RXXXXG5", T1RXXXXG5_list, stringWriter);
@@ -81,7 +77,8 @@ public class RowsToXMLProcessorImpl implements RowsToXMLProcessor {
         return stringWriter.toString();
     }
 
-    private void fillTagsLists(List<DBFRow> rows) {
+    @Override
+    void fillTagsLists(List<DBFRow> rows) {
         AtomicInteger curRowNum = new AtomicInteger(1);
         rows.forEach(row -> {
             fillTagList(T1RXXXXG5_list, curRowNum, String.valueOf(row.getUKR_GROMAD()));
@@ -111,39 +108,5 @@ public class RowsToXMLProcessorImpl implements RowsToXMLProcessor {
 
             curRowNum.getAndIncrement();
         });
-    }
-
-    private void fillTagList(List<XMLTag> tagList, AtomicInteger curRowNum, String value) {
-        XMLTag tag = new XMLTag();
-        tag.setRownum(curRowNum.get());
-        if (value != null && !value.equals("")) {
-            tag.setValue(value.toUpperCase());
-        } else {
-            tag.setXsinil(true);
-        }
-        tagList.add(tag);
-    }
-
-    private void writeTag(String tagName, List<XMLTag> tags, StringWriter stringWriter) {
-        try {
-            final JAXBContext jaxbContext = JAXBContext.newInstance(XMLTag.class);
-            final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.setProperty("com.sun.xml.bind.xmlDeclaration", false);
-
-            for (XMLTag tag : tags) {
-                QName qName = new QName("", tagName);
-                JAXBElement<XMLTag> root = new JAXBElement<>(qName, XMLTag.class, tag);
-
-                try {
-                    jaxbMarshaller.marshal(root, stringWriter);
-                } catch (JAXBException e) {
-                    e.printStackTrace();
-                }
-                stringWriter.append("\r\n");
-            }
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
     }
 }

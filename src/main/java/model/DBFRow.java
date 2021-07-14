@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DBFRow {
+    // Six form
     BigDecimal PERIOD_M;
     BigDecimal PERIOD_Y;
     BigDecimal UKR_GROMAD;
@@ -37,4 +38,16 @@ public class DBFRow {
     BigDecimal NRC;
     BigDecimal NRM;
     String OZN;
+
+    // Four DF
+    BigDecimal NP;
+    String TIN;
+    BigDecimal S_NAR;
+    BigDecimal S_DOX;
+    BigDecimal S_TAXN;
+    BigDecimal S_TAXP;
+    BigDecimal A051;
+    BigDecimal A05;
+    BigDecimal OZN_DOX;
+
 }
